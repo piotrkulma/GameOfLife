@@ -1,8 +1,7 @@
 package gameol.graphic;
 
+import gameol.simulation.GameOLConfig;
 import gameol.matrix.CellState;
-import gameol.utils.GlobalTimer;
-import gameol.LifeFrameAction;
 import gameol.utils.LifeMatrixUtils;
 import gameol.matrix.Cell;
 import gameol.matrix.LifeMatrix;
@@ -13,37 +12,29 @@ import java.awt.*;
 /**
  * Created by Piotr Kulma on 16.08.14.
  */
-public class GameOLPanel extends JPanel implements LifeFrameAction {
-    private int scale = 8;
-    private int matrixSize = 30;
-    private int timerInterval = 100;
-
+public class GameOLPanel extends JPanel implements MatrixRedrawer {
     private Image offscreen;
-
     private LifeMatrix matrix;
-    private GlobalTimer timer;
 
     public GameOLPanel() {
-
-        initMatrix();
-        initTimer();
+        matrix = null;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        drawCells(g);
+        if(matrix != null) {
+            drawCells(g);
+        }
     }
 
     @Override
-    public void performFrame() {
-        LifeMatrixUtils.recountNeighbors(matrix);
-        LifeMatrixUtils.resurrectOrKill(matrix);
-
+    public void redraw(LifeMatrix matrix) {
+        this.matrix = matrix;
         this.repaint();
     }
 
     private void drawCells(Graphics g) {
-        offscreen = createImage(400, 400);
+        offscreen = createImage(GameOLConfig.WINDOW_WIDTH, GameOLConfig.WINDOW_HEIGHT);
         Graphics2D g2d = (Graphics2D) offscreen.getGraphics();
 
         for(int i=0; i<matrix.getSize(); i++) {
@@ -58,36 +49,15 @@ public class GameOLPanel extends JPanel implements LifeFrameAction {
     private void drawCell(Cell cell, int px, int py, Graphics g2d) {
         if(cell.getState() == CellState.DEAD) {
             g2d.setColor(Color.black);
-            g2d.drawRect(px * scale, py * scale, scale, scale);
+            g2d.drawRect(px * GameOLConfig.DRAWING_SCALE, py * GameOLConfig.DRAWING_SCALE, GameOLConfig.DRAWING_SCALE, GameOLConfig.DRAWING_SCALE);
         } else if(cell.getState() == CellState.ALIVE) {
-            if(cell.getAge() == 0) {
-                g2d.setColor(Color.red);
-            } else if(cell.getAge() == 1) {
-                g2d.setColor(Color.green);
-            } else if(cell.getAge() == 2) {
-                g2d.setColor(Color.blue);
-            } else if(cell.getAge() == 3) {
-                g2d.setColor(Color.yellow);
+            if(GameOLConfig.AGING_COLOURS_ENABLED) {
+                g2d.setColor(LifeMatrixUtils.getAgeColor(cell.getAge()));
             } else {
                 g2d.setColor(Color.black);
             }
 
-            g2d.fillRect(px * scale, py * scale, scale, scale);
+            g2d.fillRect(px * GameOLConfig.DRAWING_SCALE, py * GameOLConfig.DRAWING_SCALE, GameOLConfig.DRAWING_SCALE, GameOLConfig.DRAWING_SCALE);
         }
-    }
-
-    //TODO jakieś wczytywanie, czy coś
-    private void initMatrix() {
-        matrix = new LifeMatrix(matrixSize);
-        matrix.setCellAt(10, 9, CellState.ALIVE);
-        matrix.setCellAt(10, 10, CellState.ALIVE);
-        matrix.setCellAt(10, 11, CellState.ALIVE);
-        matrix.setCellAt(9, 11, CellState.ALIVE);
-        matrix.setCellAt(8, 10, CellState.ALIVE);
-    }
-
-    private void initTimer() {
-        timer = new GlobalTimer(timerInterval, this);
-        timer.start();
     }
 }

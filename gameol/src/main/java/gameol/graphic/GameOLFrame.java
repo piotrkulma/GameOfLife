@@ -1,5 +1,8 @@
 package gameol.graphic;
 
+import gameol.simulation.GameOLConfig;
+import gameol.simulation.LifeSimulation;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,6 +11,7 @@ import java.awt.*;
  */
 public class GameOLFrame extends JFrame {
     private GameOLPanel drawPanel;
+    private LifeSimulation simulation;
 
     public GameOLFrame() {
         super("Game of life BETA");
@@ -17,10 +21,11 @@ public class GameOLFrame extends JFrame {
     private void init() {
         initFrame();
         initDrawPanel();
+        initSimulation();
     }
 
     private void initFrame() {
-        this.setSize(400, 400);
+        this.setSize(GameOLConfig.WINDOW_WIDTH, GameOLConfig.WINDOW_WIDTH);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -28,5 +33,9 @@ public class GameOLFrame extends JFrame {
     private void initDrawPanel() {
         drawPanel = new GameOLPanel();
         this.getContentPane().add(drawPanel, BorderLayout.CENTER);
+    }
+
+    private void initSimulation() {
+        simulation = new LifeSimulation(drawPanel);
     }
 }

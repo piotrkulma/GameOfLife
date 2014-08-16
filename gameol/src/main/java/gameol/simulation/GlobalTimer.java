@@ -1,6 +1,6 @@
-package gameol.utils;
+package gameol.simulation;
 
-import gameol.LifeFrameAction;
+import gameol.simulation.LifeFrameAction;
 
 /**
  * Created by Piotr Kulma on 16.08.14.
@@ -9,18 +9,18 @@ public class GlobalTimer extends Thread {
     private boolean running;
     private long interval;
 
-    private LifeFrameAction action;
+    private LifeFrameAction lifeFrameAction;
 
-    public GlobalTimer(long interval, LifeFrameAction action) {
+    public GlobalTimer(long interval, LifeFrameAction lifeFrameAction) {
         this.interval = interval;
-        this.action = action;
+        this.lifeFrameAction = lifeFrameAction;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                action.performFrame();
+                lifeFrameAction.performFrame();
                 Thread.sleep(interval);
             } catch (Exception e) {
                 e.printStackTrace();
