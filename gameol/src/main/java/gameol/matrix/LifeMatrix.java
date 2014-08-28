@@ -29,6 +29,10 @@ public class LifeMatrix {
         matrix[x][y].setState(value);
     }
 
+    public void clearMatrix() {
+        fillMatrix(CellState.DEAD);
+    }
+
     private void initMatrix() {
         matrix = new Cell[size][size];
 

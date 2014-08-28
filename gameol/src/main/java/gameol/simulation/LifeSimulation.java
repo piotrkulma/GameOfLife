@@ -14,6 +14,9 @@ public class LifeSimulation implements LifeFrameAction {
     private GlobalTimer timer;
     private MatrixRedrawer redraw;
 
+    private boolean active;
+    private boolean activated;
+
     //TODO
     private int pattern_gilder[][] =
             {
@@ -24,6 +27,8 @@ public class LifeSimulation implements LifeFrameAction {
 
     public LifeSimulation(MatrixRedrawer redraw) {
         this.redraw = redraw;
+        this.active = false;
+        this.activated = false;
 
         initMatrix();
         initTimer();
@@ -35,6 +40,31 @@ public class LifeSimulation implements LifeFrameAction {
         setCells();
 
         redraw.redraw(matrix);
+    }
+
+    public void startSimulation() {
+        active = true;
+
+        if(activated) {
+            this.timer.wakeup();
+        } else {
+            this.timer.start();
+            activated = true;
+        }
+    }
+
+    public void pauseSimulation() {
+        active = false;
+        this.timer.pause();
+    }
+
+    public void clearAndPauseSimulation() {
+        pauseSimulation();
+        matrix.clearMatrix();
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     private void countNeighbors() {
@@ -85,6 +115,6 @@ public class LifeSimulation implements LifeFrameAction {
 
     private void initTimer() {
         timer = new GlobalTimer(GameOLConfig.TIMER_INTERVAL, this);
-        timer.start();
+        //timer.start();
     }
 }
